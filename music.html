@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player</title>
+    <script src="https://kit.fontawesome.com/1577ac0209.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="main_div">
+        <div class="music_container">
+            <h2 id="title">wo tumhi ho</h2>
+            <h3 id="artist">aitraaz</h3>
+            <div class="img_container">
+                <img src="music.png" alt="">
+            </div>
+            <audio src="music/1.mp3"></audio>
+
+            <!-- Progress Bar -->
+
+            <div class="progressbar_container" id="progress_container">
+                <div class="progress_duration_meter">
+                    <div id="current_time">
+                        0:00
+                    </div>
+                    <div id="duration">
+                        2:44
+                    </div>
+                </div>
+                <div class="progress_div" id="progress_div">
+                    <div class="progress" id="progress"></div>
+                </div>
+            </div>
+
+            <!-- controls -->
+
+            <div class="music_controls">
+                <i class="fa-solid fa-backward" id="prev" title="Previous"></i>
+                <i class="fa-solid fa-play main_button" id="play" title="Play"></i>
+                <!-- <i class="fa-solid fa-pause"></i> -->
+                <i class="fa-solid fa-forward" id="next" title="Next"></i>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const music = document.querySelector("audio");
+        const img = document.querySelector("img");
+        const play = document.getElementById("play");
+        const title = document.getElementById("title");
+        const artist = document.getElementById("artist");
+        const prev = document.getElementById("prev");
+        const next = document.getElementById("next");
+        let progress = document.getElementById("progress");
+        let t_duration = document.getElementById("duration");
+        let t_current_time = document.getElementById("current_time");
+        let progress_div = document.getElementById("progress_div");
+        let isPlaying = false;
+
+        const songs = [
+            {
+                name : "1",
+                title : "wo tumhi ho",
+                artist : "aitraaz",
+            },
+            {
+                name : "2",
+                title : "chal kudiye",
+                artist : "sunny deol",
+            },
+            {
+                name : "3",
+                title : "miss pooja",
+                artist : "album",
+            }
+        ];
+
+        // for play function
+        const playmusic = () => {
+            isPlaying = true;
+            music.play();
+            play.classList.replace("fa-play", "fa-pause");
+            img.classList.add("anime");
+        };
+
+        // for pause function
+        const pausemusic = () => {
+            isPlaying = false;
+            music.pause();
+            play.classList.replace("fa-pause", "fa-play");
+            img.classList.remove("anime");
+        };
+
+        play.addEventListener("click", () => {
+            // if(isPlaying){
+            //     pausemusic();
+            // }else{
+            //     playmusic();
+            // }
+
+            isPlaying ? pausemusic() : playmusic();
+        });
+
+        // changing the music data
+
+        const loadSongs = (songs) => {
+            title.textContent = songs.title;
+            artist.textContent = songs.artist;
+            music.src = "music/" + songs.name + ".mp3";
+            // img.src = songs.name + ".jpg";
+        }
+
+        songIndex = 0;
+        // loadSongs(songs[0]);
+
+        const nextSong = () => {
+            songIndex = (songIndex + 1) % songs.length;
+            loadSongs(songs[songIndex]);
+            playmusic();
+        }
+
+        const prevSong = () => {
+            songIndex = (songIndex - 1 + songs.length) % songs.length;
+            loadSongs(songs[songIndex]);
+            playmusic();
+        }
+
+        // progress coding
+
+        music.addEventListener("timeupdate", (event) => {
+            // console.log(event);
+            const{currentTime, duration} = event.srcElement;
+            // console.log("Current" + currentTime);
+            // console.log("Duration" + duration);
+            let progress_time = (currentTime / duration) * 100;
+            progress.style.width = `${progress_time}%`;
+
+            // music duration update
+
+            let min_duration = Math.floor(duration / 60);
+            let sec_duration = Math.floor(duration % 60);
+
+            let tot_duration = `${min_duration}:${sec_duration}`;
+            if(duration){
+                t_duration.textContent = `${tot_duration}`;
+            }
+
+            // music duration update
+
+            let min_current = Math.floor(currentTime / 60);
+            let sec_current = Math.floor(currentTime % 60);
+
+            
+            if(sec_current < 10){
+                sec_current = `0${sec_current}`;
+            }
+            let tot_current = `${min_current}:${sec_current}`;
+            t_current_time.textContent = `${tot_current}`;
+        });
+
+        // progress onclick function
+
+        progress_div.addEventListener("click", (event) => {
+            const {duration} = music;
+
+            let move_progress = (event.offsetX / event.srcElement.clientWidth) * duration;
+            music.currentTime = move_progress;
+        });
+
+        // if music end and call next song function
+
+        music.addEventListener("ended", nextSong);
+
+        next.addEventListener("click", nextSong);
+        prev.addEventListener("click", prevSong);
+    </script>
+</body>
+</html>
